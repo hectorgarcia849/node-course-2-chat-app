@@ -1,14 +1,23 @@
 const path = require('path');
+const http = require('http');
+const socketIO = require('socket.io');
+const express = require('express');
+
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
-const express = require('express');
-var app = express();
 
-console.log(publicPath);
+var app = express();
+var server = http.createServer(app); //to extend capabilities of the server to allow for socket connections
+var io = socketIO(server);
 
 app.use(express.static(publicPath)); //location of files we will read from
 
+io.on('connection', (socket) => {
+    console.log("New user connected");
+    socket.on('disconnect', () => { console.log("Client Disconnected");});
+}); //register an event listener, in this case incoming connections
 
-app.listen(port,() => {
+
+server.listen(port,() => {
     console.log(`Server is up on port ${port}`)
 });
