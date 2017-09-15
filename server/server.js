@@ -15,6 +15,17 @@ app.use(express.static(publicPath)); //location of files we will read from
 io.on('connection', (socket) => {
     console.log("New user connected");
 
+    socket.emit('newMessage', {
+        from: 'Admin',
+        text: 'Welcome to the chat app'
+    });
+
+    socket.broadcast.emit('newMessage', {
+        from: 'Admin',
+        text: 'New user joined',
+        createdAt: new Date().getTime()
+    });
+
     socket.on('createMessage', (message) => {
         message.createdAt = new Date().getTime();
         console.log('createMessage', message);
@@ -23,6 +34,13 @@ io.on('connection', (socket) => {
             text:message.text,
             createdAt:message.createdAt
         }); //emits event to every single connection
+
+        // socket.broadcast.emit('newMessage', {
+        //     from: message.from,
+        //     text: message.text,
+        //     createdAt: new Date().getTime()
+        // }); //sends to everyone except for the person who triggered event
+
     });
 
     socket.on('disconnect', () => { console.log("Client Disconnected");});
