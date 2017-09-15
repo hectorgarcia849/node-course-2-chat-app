@@ -4,6 +4,7 @@ const socketIO = require('socket.io');
 const express = require('express');
 
 const {generateMessage} = require('./utils/message');
+const {generateLocationMessage} = require('./utils/message');
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
 
@@ -24,12 +25,10 @@ io.on('connection', (socket) => {
         console.log('createMessage', message);
         io.emit('newMessage', generateMessage(message.from, message.text)); //emits event to every single connection
         callback('This is from the server.');
-        // socket.broadcast.emit('newMessage', {
-        //     from: message.from,
-        //     text: message.text,
-        //     createdAt: new Date().getTime()
-        // }); //sends to everyone except for the person who triggered event
+    });
 
+    socket.on('createLocationMessage', (coords) => {
+        io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
     });
 
     socket.on('disconnect', () => { console.log("Client Disconnected");});
